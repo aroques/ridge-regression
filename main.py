@@ -16,11 +16,11 @@ def main():
     
     plot_exp(x1, y_train, w, w_reg)
 
-def ridge_regression(x_train, y_train, regulizer):
+def ridge_regression(x_train, y_train, regularizer):
     I = np.identity(x_train.shape[1])
     xTx = np.dot(x_train.T, x_train)
     xTy = np.dot(x_train.T, y_train)
-    return np.dot(np.linalg.pinv(np.add(xTx, regulizer * I)), xTy)
+    return np.dot(np.linalg.pinv(np.add(xTx, regularizer * I)), xTy)
 
 
 def linear_regression(x_train, y_train):
