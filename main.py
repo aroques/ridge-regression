@@ -14,17 +14,27 @@ def main():
     print_regression_eq('without reg', w)
     print_regression_eq('with reg', w_reg)
     
-    cross_validation(x_train, y_train)
+    cv_error = cross_validation(x_train, y_train)
+    print('cross validation error: {}'.format(cv_error))
 
     plot_exp(x1, y_train, w, w_reg)
 
 
-def cross_validation(x_train, y_train):
+def cross_validation(x_train, y_train, num_splits=3):
     d = np.column_stack((x_train, y_train))
-    for this_d in np.split(d, 3):
+    w = np.zeros([num_splits, x_train.shape[1]])
+    cv_error = np.zeros(num_splits)
+    
+    for i, this_d in enumerate(np.split(d, num_splits)):
         x_train, y_train = this_d[:, :-1], this_d[:, -1] 
-        this_w = ridge_regression(x_train, y_train, regularizer=0.1)
-        print(this_w)   
+        w[i] = ridge_regression(x_train, y_train, regularizer=0.1)
+        cv_error[i] = calculate_error(w[i], x_train, y_train)
+
+    return np.average(cv_error)
+
+def calculate_error(w, x_train, y_train):
+    y = np.dot(x_train, w)
+    return np.average(np.square(np.subtract(y, y_train)))
 
 
 def ridge_regression(x_train, y_train, regularizer):
