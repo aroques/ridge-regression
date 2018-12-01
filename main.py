@@ -66,7 +66,9 @@ def get_y_train(x1):
 
 def print_training_data(x1, y_train):
     print('(x, y) pairs:')
-    print(str(np.column_stack((x1, y_train))) + '\n')
+    d = np.column_stack((x1, y_train))
+    d_sorted = d[np.argsort(d[:, 0])]
+    print(str(d_sorted) + '\n')
 
 
 def print_regression_eq(label, w, error):
