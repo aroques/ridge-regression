@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def main():
-    x1 = np.random.uniform(-2, 10, 12)
+    x1 = np.random.uniform(low=-2, high=10, size=12)
     x_train = get_x_train(x1)
     y_train = get_y_train(x1)
 
