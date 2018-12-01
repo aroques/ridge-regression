@@ -12,9 +12,9 @@ def main():
     best_r = determine_reg_param(x_train, y_train)
     w_reg = ridge_regression(x_train, y_train, regularizer=best_r) 
     
-    print_regression_eq('without reg', w, calculate_error(w, x_train, y_train))
+    print_regression_eq('without reg', w, round(calculate_error(w, x_train, y_train), 2))
     print()
-    print_regression_eq('with reg', w_reg, calculate_error(w_reg, x_train, y_train))
+    print_regression_eq('with reg', w_reg, round(calculate_error(w_reg, x_train, y_train), 2))
     
     plot_exp(x1, y_train, w, w_reg)
 
@@ -37,6 +37,7 @@ def cross_validation(x_train, y_train, num_splits, regularizer):
         cv_error[i] = calculate_error(w, x_train, y_train)
 
     return np.average(cv_error)
+
 
 def calculate_error(w, x_train, y_train):
     y = np.dot(x_train, w)
