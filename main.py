@@ -14,7 +14,18 @@ def main():
     print_regression_eq('without reg', w)
     print_regression_eq('with reg', w_reg)
     
+    cross_validation(x_train, y_train)
+
     plot_exp(x1, y_train, w, w_reg)
+
+
+def cross_validation(x_train, y_train):
+    d = np.column_stack((x_train, y_train))
+    for this_d in np.split(d, 3):
+        x_train, y_train = this_d[:, :-1], this_d[:, -1] 
+        this_w = ridge_regression(x_train, y_train, regularizer=0.1)
+        print(this_w)   
+
 
 def ridge_regression(x_train, y_train, regularizer):
     I = np.identity(x_train.shape[1])
