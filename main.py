@@ -9,26 +9,32 @@ def main():
     print_training_data(x1, y_train)
 
     w = linear_regression(x_train, y_train)
-    w_reg = ridge_regression(x_train, y_train, regularizer=30) 
-
-    print_regression_eq('without reg', w)
-    print_regression_eq('with reg', w_reg)
+    best_r = determine_reg_param(x_train, y_train)
+    w_reg = ridge_regression(x_train, y_train, regularizer=best_r) 
     
-    cv_error = cross_validation(x_train, y_train)
-    print('cross validation error: {}'.format(cv_error))
-
+    print_regression_eq('without reg', w, calculate_error(w, x_train, y_train))
+    print()
+    print_regression_eq('with reg', w_reg, calculate_error(w_reg, x_train, y_train))
+    
     plot_exp(x1, y_train, w, w_reg)
 
 
-def cross_validation(x_train, y_train, num_splits=3):
+def determine_reg_param(x_train, y_train):
+    regularizers = [0.1, 1, 10, 100]
+    cv_error = np.zeros_like(regularizers)
+    for i, r in enumerate(regularizers):
+        cv_error[i] = cross_validation(x_train, y_train, 3, r)
+    return regularizers[np.argmin(cv_error)]
+
+
+def cross_validation(x_train, y_train, num_splits, regularizer):
     d = np.column_stack((x_train, y_train))
-    w = np.zeros([num_splits, x_train.shape[1]])
     cv_error = np.zeros(num_splits)
     
     for i, this_d in enumerate(np.split(d, num_splits)):
         x_train, y_train = this_d[:, :-1], this_d[:, -1] 
-        w[i] = ridge_regression(x_train, y_train, regularizer=0.1)
-        cv_error[i] = calculate_error(w[i], x_train, y_train)
+        w = ridge_regression(x_train, y_train, regularizer)
+        cv_error[i] = calculate_error(w, x_train, y_train)
 
     return np.average(cv_error)
 
@@ -62,8 +68,9 @@ def print_training_data(x1, y_train):
     print(str(np.column_stack((x1, y_train))) + '\n')
 
 
-def print_regression_eq(label, w):
+def print_regression_eq(label, w, error):
     print('{0:12}: y = {1}x + {2}'.format(label, round(w[1], 2), round(w[0], 2)))
+    print('{0:12}: {1}'.format('error', error))
 
 
 def plot_exp(x1, y_train, w, w_reg):
