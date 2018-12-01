@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def main():
     x1 = np.random.uniform(low=-2, high=10, size=12)
@@ -20,11 +21,25 @@ def main():
 
 
 def determine_reg_param(x_train, y_train):
-    regularizers = [0.1, 1, 10, 100]
+    regularizers = np.array([0.1, 1, 10, 100])
     cv_error = np.zeros_like(regularizers)
+    ein = np.zeros_like(regularizers)
+    
     for i, r in enumerate(regularizers):
+        w = ridge_regression(x_train, y_train, regularizer=r) 
+        ein[i] = calculate_error(w, x_train, y_train)
         cv_error[i] = cross_validation(x_train, y_train, 3, r)
+
+    print_cross_validation_results(regularizers, ein, cv_error)
+    
     return regularizers[np.argmin(cv_error)]
+
+
+def print_cross_validation_results(regularizers, ein, cv_error):
+    cv_summary = np.round(np.column_stack((regularizers, ein, cv_error)), 2)
+    df = pd.DataFrame(cv_summary, columns=['lambda', 'in-sample error', 'cv error'])
+    print(str(df))
+    print('choose lambda = ' + str(regularizers[np.argmin(cv_error)]) + '\n')
 
 
 def cross_validation(x_train, y_train, num_splits, regularizer):
@@ -65,10 +80,10 @@ def get_y_train(x1):
 
 
 def print_training_data(x1, y_train):
-    print('(x, y) pairs:')
     d = np.column_stack((x1, y_train))
     d_sorted = d[np.argsort(d[:, 0])]
-    print(str(d_sorted) + '\n')
+    df = pd.DataFrame(np.round(d_sorted, 2), columns=['x', 'y'])
+    print(str(df) + '\n')
 
 
 def print_regression_eq(label, w, error):
